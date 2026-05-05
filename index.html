@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YumDrop 🍜</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   ROOT & RESET
+═══════════════════════════════════════ */
+:root {
+  --yum:   #FF3B5C;
+  --yum2:  #FF6B81;
+  --drop:  #00F5A0;
+  --drop2: #00D4FF;
+  --sun:   #FFD60A;
+  --grape: #BF5AF2;
+  --orange:#FF9F0A;
+  --sky:   #0A84FF;
+  --ink:   #0A0A0F;
+  --ink2:  #13131A;
+  --ink3:  #1C1C26;
+  --glass: rgba(255,255,255,0.06);
+  --glass2:rgba(255,255,255,0.10);
+  --text:  #F0F0FF;
+  --text2: #8888AA;
+  --text3: #4A4A66;
+  --r:     18px;
+  --r2:    12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;background:#000;}
+body{font-family:'Bricolage Grotesque',sans-serif;display:flex;align-items:center;justify-content:center;}
+
+/* ═══════════════════════════════════════
+   PHONE SHELL
+═══════════════════════════════════════ */
+.device{
+  position:relative;
+  width:420px; height:100vh; max-height:900px;
+  background:var(--ink);
+  border-radius:44px;
+  overflow:hidden;
+  box-shadow:0 0 0 1px rgba(255,255,255,0.08), 0 40px 100px rgba(0,0,0,0.8);
+}
+.status{
+  height:36px;
+  background:var(--ink);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 22px;
+  flex-shrink:0;
+  position:relative;z-index:20;
+}
+.s-time{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--text);}
+.s-right{display:flex;gap:4px;font-size:10px;color:var(--text2);}
+
+/* TOP BAR */
+.topbar{
+  height:52px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;
+  background:var(--ink);
+  flex-shrink:0;
+  position:relative;z-index:20;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.logo{
+  font-family:'Clash Display',sans-serif;
+  font-size:24px;font-weight:700;
+  background:linear-gradient(135deg,var(--yum),var(--orange));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.topbar-right{display:flex;gap:8px;align-items:center;}
+.tb-icon{
+  width:36px;height:36px;border-radius:12px;
+  background:var(--glass);border:1px solid rgba(255,255,255,0.08);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;cursor:pointer;transition:all .2s;
+}
+.tb-icon:hover{background:var(--glass2);}
+.live-btn{
+  background:var(--yum);color:white;
+  font-size:10px;font-weight:700;
+  padding:6px 12px;border-radius:20px;
+  cursor:pointer;letter-spacing:0.05em;
+  animation:pulse-red 2s infinite;
+}
+@keyframes pulse-red{0%,100%{box-shadow:0 0 0 0 rgba(255,59,92,.4)}50%{box-shadow:0 0 0 6px rgba(255,59,92,0)}}
+
+/* ═══════════════════════════════════════
+   SCREENS
+═══════════════════════════════════════ */
+.screens{flex:1;overflow:hidden;position:relative;}
+.screen{
+  position:absolute;inset:0;
+  overflow-y:auto;overflow-x:hidden;
+  padding-bottom:78px;
+  opacity:0;transform:translateX(28px);
+  pointer-events:none;
+  transition:opacity .28s,transform .28s cubic-bezier(.4,0,.2,1);
+  scrollbar-width:none;
+  background:var(--ink);
+}
+.screen::-webkit-scrollbar{display:none;}
+.screen.active{opacity:1;transform:translateX(0);pointer-events:all;}
+.screen.exit{opacity:0;transform:translateX(-28px);}
+
+/* ═══════════════════════════════════════
+   BOTTOM NAV
+═══════════════════════════════════════ */
+.bnav{
+  display:flex;
+  background:var(--ink2);
+  border-top:1px solid rgba(255,255,255,0.08);
+  padding:8px 4px 14px;
+  position:relative;z-index:20;
+}
+.nb{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+  cursor:pointer;padding:4px 2px;border-radius:12px;
+  border:none;background:transparent;font-family:inherit;transition:all .2s;
+}
+.nb:hover{background:var(--glass);}
+.nb.active{background:rgba(255,59,92,.08);}
+.nb-ic{
+  width:34px;height:34px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;transition:all .2s;
+  background:rgba(255,255,255,0.04);
+}
+.nb.active .nb-ic{background:var(--yum);}
+.nb-lbl{font-size:9px;font-weight:700;color:var(--text3);letter-spacing:.02em;}
+.nb.active .nb-lbl{color:var(--yum);}
+.nb-cam .nb-ic{
+  width:48px;height:48px;border-radius:16px;
+  background:linear-gradient(135deg,var(--yum),var(--orange));
+  font-size:22px;margin-top:-10px;
+  box-shadow:0 4px 18px rgba(255,59,92,.5);
+}
+.nb-cam .nb-lbl{color:rgba(255,255,255,.5);}
+
+/* ═══════════════════════════════════════
+   ★ HOME / REEL FEED
+═══════════════════════════════════════ */
+.feed-tabs{
+  display:flex;gap:0;padding:0 16px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  flex-shrink:0;
+}
+.ftab{
+  font-size:13px;font-weight:600;color:var(--text2);
+  padding:10px 14px 8px;cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .2s;
+}
+.ftab.active{color:white;border-bottom-color:var(--yum);}
+
+/* REEL CARD — full width TikTok style */
+.reel-card{
+  position:relative;width:100%;
+  background:var(--ink2);
+  margin-bottom:2px;overflow:hidden;
+}
+.reel-video{
+  width:100%;height:480px;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;
+}
+/* gradient backgrounds simulating video */
+.rv-1{background:linear-gradient(160deg,#0D1F0A 0%,#1A2F10 40%,#0A1508 100%);}
+.rv-2{background:linear-gradient(160deg,#1A0808 0%,#2D0F0F 40%,#0F0505 100%);}
+.rv-3{background:linear-gradient(160deg,#080A1A 0%,#0F1030 40%,#050510 100%);}
+.rv-4{background:linear-gradient(160deg,#1A1008 0%,#2D1F0A 40%,#0F0A05 100%);}
+.rv-5{background:linear-gradient(160deg,#0A0A18 0%,#12122A 40%,#070714 100%);}
+.reel-emoji{font-size:110px;opacity:.85;filter:drop-shadow(0 8px 24px rgba(0,0,0,.5));}
+/* video grain overlay */
+.reel-video::before{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+  opacity:.4;pointer-events:none;
+}
+/* play indicator */
+.play-ring{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:54px;height:54px;border-radius:50%;
+  background:rgba(255,255,255,.12);backdrop-filter:blur(4px);
+  border:1.5px solid rgba(255,255,255,.25);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;cursor:pointer;transition:all .2s;
+}
+.play-ring:hover{background:rgba(255,255,255,.2);transform:translate(-50%,-50%) scale(1.08);}
+/* duration badge */
+.duration{
+  position:absolute;bottom:10px;right:10px;
+  font-family:'DM Mono',monospace;font-size:10px;font-weight:500;
+  background:rgba(0,0,0,.6);color:white;
+  padding:3px 7px;border-radius:6px;
+}
+/* progress bar */
+.reel-progress{
+  position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:rgba(255,255,255,.1);
+}
+.reel-progress-fill{
+  height:100%;background:linear-gradient(90deg,var(--yum),var(--orange));
+  transition:width .1s;
+}
+
+/* reel side actions */
+.reel-actions{
+  position:absolute;right:14px;bottom:90px;
+  display:flex;flex-direction:column;gap:18px;
+  align-items:center;
+}
+.ra{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:all .2s;}
+.ra:hover{transform:scale(1.12);}
+.ra-ic{
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.1);backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+}
+.ra-ic.liked{background:rgba(255,59,92,.2);border-color:rgba(255,59,92,.4);}
+.ra-lbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.85);}
+
+/* creator strip */
+.reel-creator{
+  position:absolute;left:14px;bottom:90px;right:70px;
+}
+.rc-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.rc-avatar{
+  width:40px;height:40px;border-radius:50%;
+  border:2px solid var(--yum);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:700;flex-shrink:0;
+  position:relative;overflow:hidden;
+}
+.rc-info{}
+.rc-name{font-size:13px;font-weight:700;color:white;}
+.rc-origin{font-size:10px;color:rgba(255,255,255,.55);}
+.follow-pill{
+  background:var(--yum);color:white;
+  font-size:9px;font-weight:800;
+  padding:3px 9px;border-radius:12px;cursor:pointer;
+  margin-left:6px;
+}
+.reel-title{font-size:14px;font-weight:700;color:white;margin-bottom:5px;line-height:1.3;}
+.reel-tags{display:flex;gap:5px;flex-wrap:wrap;}
+.rtag{font-size:10px;font-weight:700;color:rgba(255,255,255,.7);background:rgba(255,255,255,.1);padding:3px 8px;border-radius:12px;}
+.rtag.ai{color:var(--grape);background:rgba(191,90,242,.15);}
+.story-snippet{
+  font-size:11px;color:rgba(255,255,255,.6);
+  line-height:1.5;margin-top:6px;font-style:italic;
+}
+/* audio row */
+.reel-audio{
+  position:absolute;bottom:52px;left:14px;
+  display:flex;align-items:center;gap:7px;
+  font-size:10px;color:rgba(255,255,255,.6);
+}
+.audio-disc{
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,#333,#666);
+  border:2px solid rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;
+  animation:spin-disc 3s linear infinite;
+}
+@keyframes spin-disc{to{transform:rotate(360deg)}}
+
+/* reel body info */
+.reel-info{
+  padding:14px 16px 10px;
+  background:var(--ink2);
+}
+.ri-row{display:flex;gap:16px;align-items:center;margin-bottom:10px;}
+.ri-stat{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--text2);}
+.ri-stat span{color:var(--text);}
+.cook-now-btn{
+  display:flex;align-items:center;gap:7px;
+  background:linear-gradient(135deg,var(--yum),var(--orange));
+  color:white;font-size:12px;font-weight:700;
+  padding:9px 14px;border-radius:12px;
+  cursor:pointer;transition:all .2s;
+  margin-left:auto;
+}
+.cook-now-btn:hover{transform:scale(1.03);}
+
+/* STORY section cards */
+.story-scroll{overflow-x:auto;padding:12px 16px;display:flex;gap:10px;scrollbar-width:none;}
+.story-scroll::-webkit-scrollbar{display:none;}
+.story-chip{
+  flex:0 0 auto;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  cursor:pointer;
+}
+.story-ring{
+  width:58px;height:58px;border-radius:50%;
+  padding:2px;
+  background:linear-gradient(135deg,var(--yum),var(--orange),var(--grape));
+  flex-shrink:0;
+}
+.story-inner{
+  width:100%;height:100%;border-radius:50%;
+  background:var(--ink3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;border:2px solid var(--ink);
+}
+.story-lbl{font-size:9px;font-weight:700;color:var(--text2);text-align:center;max-width:60px;}
+
+/* ═══════════════════════════════════════
+   ★ CAMERA / RECORD SCREEN
+═══════════════════════════════════════ */
+#sc-camera{background:#000;display:flex;flex-direction:column;padding-bottom:0;}
+.cam-viewfinder{
+  flex:1;position:relative;overflow:hidden;
+  background:radial-gradient(ellipse at 40% 40%,#1a2a10 0%,#0a150a 100%);
+  min-height:0;
+}
+.cam-grain{
+  position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
+  pointer-events:none;
+}
+.cam-content{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:10px;
+}
+.cam-scene-emoji{font-size:90px;filter:drop-shadow(0 4px 20px rgba(0,0,0,.4));}
+.cam-hint{font-size:11px;color:rgba(255,255,255,.4);font-weight:600;text-align:center;}
+/* grid overlay */
+.cam-grid{
+  position:absolute;inset:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+  background-size:33.33% 25%;
+}
+/* recording indicator */
+.rec-indicator{
+  position:absolute;top:14px;left:14px;
+  display:flex;align-items:center;gap:6px;
+  background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:20px;padding:5px 10px;
+  opacity:0;transition:opacity .3s;
+}
+.rec-indicator.active{opacity:1;}
+.rec-dot{width:8px;height:8px;border-radius:50%;background:var(--yum);animation:rec-blink .8s infinite;}
+@keyframes rec-blink{0%,100%{opacity:1}50%{opacity:.2}}
+.rec-time{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:white;}
+
+/* cam top controls */
+.cam-top{
+  position:absolute;top:14px;right:14px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.cam-ctrl{
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(0,0,0,.5);backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;cursor:pointer;transition:all .2s;
+}
+.cam-ctrl:hover{background:rgba(255,255,255,.15);}
+
+/* recipe overlay bottom */
+.cam-recipe-strip{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(transparent,rgba(0,0,0,.8));
+  padding:40px 16px 14px;
+}
+.crs-label{font-size:9px;font-weight:800;color:var(--drop);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.crs-recipe{font-size:14px;font-weight:700;color:white;margin-bottom:6px;}
+.crs-chips{display:flex;gap:5px;flex-wrap:wrap;}
+.crs-chip{font-size:9px;font-weight:700;color:rgba(255,255,255,.7);background:rgba(255,255,255,.12);padding:3px 8px;border-radius:10px;}
+
+/* speed controls */
+.cam-speeds{
+  position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
+  display:flex;gap:6px;
+}
+.speed-btn{
+  font-size:10px;font-weight:800;color:rgba(255,255,255,.5);
+  background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1);
+  padding:4px 10px;border-radius:10px;cursor:pointer;transition:all .2s;
+}
+.speed-btn.active{color:var(--sun);border-color:var(--sun);background:rgba(255,214,10,.1);}
+
+/* effects strip */
+.cam-effects{
+  position:absolute;right:14px;bottom:120px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.eff-btn{
+  width:36px;height:36px;border-radius:12px;
+  background:rgba(0,0,0,.5);backdrop-filter:blur(4px);
+  border:1px solid rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;cursor:pointer;transition:all .2s;
+}
+
+/* record button area */
+.cam-controls{
+  background:var(--ink);
+  padding:14px 20px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.upload-btn{
+  width:44px;height:44px;border-radius:14px;
+  background:var(--glass);border:1px solid rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;
+}
+.record-btn{
+  width:76px;height:76px;border-radius:50%;
+  background:conic-gradient(var(--yum) 0deg, var(--yum) calc(var(--prog,0)*1deg), rgba(255,255,255,.1) calc(var(--prog,0)*1deg));
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s;
+  box-shadow:0 0 0 4px rgba(255,59,92,.25);
+  position:relative;
+}
+.record-btn::before{
+  content:'';position:absolute;inset:4px;border-radius:50%;
+  background:var(--yum);transition:all .2s;
+}
+.record-btn.recording::before{border-radius:10px;background:white;inset:24px;}
+.record-btn:hover{transform:scale(1.05);}
+.flip-btn{
+  width:44px;height:44px;border-radius:50%;
+  background:var(--glass);border:1px solid rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;
+}
+
+/* modes strip */
+.cam-modes{
+  display:flex;gap:0;overflow-x:auto;
+  padding:0 16px 12px;background:var(--ink);scrollbar-width:none;
+}
+.cam-modes::-webkit-scrollbar{display:none;}
+.cam-mode{
+  flex:0 0 auto;font-size:11px;font-weight:700;
+  color:var(--text3);padding:5px 14px;border-radius:20px;cursor:pointer;
+  transition:all .2s;
+}
+.cam-mode.active{color:white;background:var(--glass);}
+
+/* ═══════════════════════════════════════
+   ★ AI MATCHER SCREEN
+═══════════════════════════════════════ */
+.m-hero{
+  margin:14px 16px;border-radius:var(--r);
+  padding:22px 20px;
+  background:linear-gradient(135deg,#0A1628,#1A0A2E);
+  border:1px solid rgba(191,90,242,.2);
+  position:relative;overflow:hidden;
+}
+.m-hero::before{
+  content:'✨🌟💫⭐';
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  font-size:32px;opacity:.15;letter-spacing:4px;
+}
+.mh-title{
+  font-family:'Clash Display',sans-serif;
+  font-size:22px;font-weight:700;color:white;margin-bottom:3px;
+}
+.mh-sub{font-size:12px;color:var(--text2);font-weight:600;}
+
+.ing-section{padding:0 16px;margin-bottom:14px;}
+.is-label{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:9px;}
+.itags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:11px;}
+.itag{
+  font-size:12px;font-weight:700;
+  padding:7px 13px;border-radius:40px;
+  background:var(--glass);color:var(--text);
+  border:1.5px solid rgba(255,255,255,.08);
+  cursor:pointer;transition:all .18s;user-select:none;
+}
+.itag:hover{border-color:var(--grape);}
+.itag.sel{
+  background:linear-gradient(135deg,rgba(191,90,242,.2),rgba(10,132,255,.2));
+  color:white;border-color:var(--grape);
+}
+.irow{display:flex;gap:8px;}
+.iinput{
+  flex:1;background:var(--glass);border:1.5px solid rgba(255,255,255,.08);
+  border-radius:40px;padding:10px 16px;font-size:13px;
+  font-family:inherit;font-weight:600;color:var(--text);
+}
+.iinput:focus{outline:none;border-color:var(--grape);}
+.iinput::placeholder{color:var(--text3);}
+.add-btn{
+  width:44px;height:44px;background:linear-gradient(135deg,var(--grape),var(--sky));
+  color:white;border:none;border-radius:14px;font-size:22px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 10px rgba(191,90,242,.35);
+}
+.find-btn{
+  display:block;margin:0 16px 16px;width:calc(100% - 32px);
+  padding:15px;background:linear-gradient(135deg,var(--yum),var(--orange));
+  color:white;border:none;border-radius:var(--r);
+  font-family:'Clash Display',sans-serif;font-size:17px;font-weight:600;
+  cursor:pointer;transition:all .2s;
+  box-shadow:0 5px 18px rgba(255,59,92,.4);letter-spacing:.3px;
+}
+.find-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,59,92,.5);}
+.find-btn:disabled{background:var(--glass);color:var(--text3);box-shadow:none;transform:none;cursor:not-allowed;}
+
+.ai-load{
+  margin:0 16px 14px;background:var(--ink3);border-radius:var(--r);
+  border:1px solid rgba(255,255,255,.06);padding:22px;text-align:center;display:none;
+}
+.ai-load.show{display:block;}
+.ai-orb{
+  width:64px;height:64px;border-radius:50%;margin:0 auto 12px;
+  background:conic-gradient(var(--grape),var(--yum),var(--drop),var(--grape));
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+  animation:orb-spin 2s linear infinite;
+  box-shadow:0 0 24px rgba(191,90,242,.4);
+}
+@keyframes orb-spin{to{transform:rotate(360deg)}}
+.al-title{font-family:'Clash Display',sans-serif;font-size:16px;color:var(--text);margin-bottom:3px;}
+.al-sub{font-size:11px;color:var(--text2);}
+
+.match-results{padding:0 16px;}
+.mr-label{font-size:12px;font-weight:700;color:var(--text2);margin-bottom:9px;display:flex;align-items:center;gap:5px;}
+.mcard{
+  background:var(--ink3);border-radius:var(--r);
+  border:1px solid rgba(255,255,255,.06);
+  padding:12px 14px;margin-bottom:10px;
+  display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s;
+  position:relative;overflow:hidden;
+}
+.mcard:hover{border-color:rgba(255,59,92,.3);transform:translateX(3px);}
+.mcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:2px 0 0 2px;}
+.mcard.perfect::before{background:linear-gradient(180deg,var(--drop),var(--drop2));}
+.mcard.close::before{background:linear-gradient(180deg,var(--yum),var(--orange));}
+.mc-em{font-size:32px;flex-shrink:0;}
+.mc-info{flex:1;min-width:0;}
+.mc-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.mc-sub{font-size:10px;color:var(--text3);margin-bottom:5px;}
+.mc-swap{font-size:9px;font-weight:700;color:var(--grape);}
+.mc-bar{height:3px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:4px;}
+.mc-bar-fill{height:100%;border-radius:2px;transition:width .6s;}
+.mc-pct{font-family:'Clash Display',sans-serif;font-size:18px;flex-shrink:0;}
+
+/* ═══════════════════════════════════════
+   ★ COOK / STEP SCREEN
+═══════════════════════════════════════ */
+.cook-pick{padding:14px 16px 10px;}
+.ck-title{font-family:'Clash Display',sans-serif;font-size:22px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.ck-sub{font-size:12px;color:var(--text2);margin-bottom:12px;}
+.rpicks{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.rpicks::-webkit-scrollbar{display:none;}
+.rpick{
+  flex:0 0 110px;background:var(--ink3);border:1px solid rgba(255,255,255,.08);
+  border-radius:var(--r);padding:12px 10px;cursor:pointer;transition:all .2s;text-align:center;
+}
+.rpick:hover{border-color:var(--yum);}
+.rpick.sel{border-color:var(--yum);background:rgba(255,59,92,.08);}
+.rp-em{font-size:28px;margin-bottom:5px;}
+.rp-name{font-size:10px;font-weight:700;color:var(--text);line-height:1.3;}
+.rp-time{font-size:9px;color:var(--text3);margin-top:2px;}
+
+.step-card{
+  margin:0 16px 13px;background:var(--ink3);border-radius:var(--r);
+  border:1px solid rgba(255,255,255,.06);overflow:hidden;
+}
+.step-hdr{padding:12px 15px;display:flex;align-items:center;justify-content:space-between;}
+.s-badge{font-family:'Clash Display',sans-serif;font-size:13px;padding:5px 13px;border-radius:20px;color:white;}
+.s-prog{font-size:11px;font-weight:700;color:var(--text3);}
+.s-em{font-size:64px;text-align:center;display:block;padding:18px 0 14px;}
+.s-title{font-family:'Clash Display',sans-serif;font-size:20px;font-weight:600;color:var(--text);padding:0 15px 7px;}
+.s-desc{font-size:13px;color:var(--text2);line-height:1.7;padding:0 15px 15px;}
+
+.timer-row{margin:0 16px 12px;display:flex;gap:10px;}
+.tdcard{
+  flex:1;background:var(--ink3);border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--r);padding:13px;text-align:center;
+}
+.tl{font-size:10px;font-weight:700;color:var(--text3);margin-bottom:3px;letter-spacing:.04em;}
+.tn{
+  font-family:'DM Mono',monospace;font-size:32px;font-weight:500;
+  background:linear-gradient(135deg,var(--yum),var(--orange));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.tn.done{background:linear-gradient(135deg,var(--drop),var(--drop2));-webkit-background-clip:text;background-clip:text;}
+.timer-btn{
+  flex:0 0 76px;border:none;border-radius:var(--r);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  background:linear-gradient(135deg,var(--yum),var(--orange));
+  box-shadow:0 4px 14px rgba(255,59,92,.35);transition:all .2s;
+}
+.timer-btn:hover{transform:scale(1.04);}
+.ti-icon{font-size:22px;color:white;}
+.ti-lbl{font-size:9px;font-weight:800;color:rgba(255,255,255,.85);letter-spacing:.04em;}
+
+.ai-tip{
+  margin:0 16px 12px;
+  background:linear-gradient(135deg,rgba(191,90,242,.12),rgba(10,132,255,.08));
+  border:1px solid rgba(191,90,242,.2);border-radius:var(--r);padding:13px 14px;
+  display:flex;gap:10px;
+}
+.tip-sp{font-size:20px;flex-shrink:0;}
+.tip-lbl{font-size:9px;font-weight:800;color:var(--grape);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;}
+.tip-txt{font-size:12px;color:rgba(255,255,255,.7);line-height:1.55;}
+
+.sdots{display:flex;justify-content:center;gap:6px;padding:10px 0 4px;}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--glass);transition:all .3s;cursor:pointer;}
+.sdot.a{background:var(--yum);width:22px;border-radius:4px;}
+
+.snav{margin:0 16px;display:flex;gap:9px;}
+.snav-btn{flex:1;padding:13px;border-radius:var(--r);font-family:'Clash Display',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .2s;letter-spacing:.3px;}
+.snav-p{background:var(--glass);color:var(--text2);border:1px solid rgba(255,255,255,.08);}
+.snav-p:hover{border-color:var(--yum);color:white;}
+.snav-n{background:linear-gradient(135deg,var(--yum),var(--orange));color:white;box-shadow:0 4px 14px rgba(255,59,92,.4);}
+.snav-n:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(255,59,92,.5);}
+
+/* ═══════════════════════════════════════
+   ★ CHAT SCREEN
+═══════════════════════════════════════ */
+#sc-chat{display:flex;flex-direction:column;padding-bottom:0;}
+.chat-hdr{
+  padding:12px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;
+  background:var(--ink2);border-bottom:1px solid rgba(255,255,255,.06);
+}
+.ai-av{
+  width:46px;height:46px;background:linear-gradient(135deg,var(--yum),var(--orange));
+  border-radius:15px;display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;box-shadow:0 4px 14px rgba(255,59,92,.4);
+}
+.ai-nm{font-family:'Clash Display',sans-serif;font-size:17px;font-weight:600;color:var(--text);}
+.ai-st{font-size:11px;color:var(--drop);font-weight:700;display:flex;align-items:center;gap:4px;}
+.st-dot{width:5px;height:5px;border-radius:50%;background:var(--drop);animation:blink 1.5s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.rag-row{padding:10px 16px;display:flex;gap:5px;flex-wrap:wrap;flex-shrink:0;background:rgba(255,255,255,.02);border-bottom:1px solid rgba(255,255,255,.04);}
+.rb{font-size:9px;font-weight:700;padding:4px 9px;border-radius:20px;}
+.r-kb{background:rgba(255,159,10,.12);color:var(--orange);}
+.r-web{background:rgba(191,90,242,.12);color:var(--grape);}
+.r-ctx{background:rgba(0,245,160,.1);color:var(--drop);}
+
+.chat-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:11px;min-height:0;scrollbar-width:none;}
+.chat-msgs::-webkit-scrollbar{display:none;}
+.mw{display:flex;align-items:flex-end;gap:7px;}
+.mw.u{flex-direction:row-reverse;}
+.bav{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.bav.ai{background:linear-gradient(135deg,var(--yum),var(--orange));}
+.bav.u{background:linear-gradient(135deg,var(--grape),var(--sky));color:white;font-size:9px;font-weight:900;}
+.bbl{
+  max-width:74%;padding:10px 14px;font-size:13px;line-height:1.6;font-weight:500;
+  animation:pop .25s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes pop{from{transform:scale(.84);opacity:0}to{transform:scale(1);opacity:1}}
+.bbl.ai{
+  background:var(--ink3);color:var(--text);
+  border-radius:16px 16px 16px 4px;border:1px solid rgba(255,255,255,.06);
+}
+.bbl.u{
+  background:linear-gradient(135deg,var(--grape),var(--sky));color:white;
+  border-radius:16px 16px 4px 16px;
+}
+.src-t{display:inline-flex;font-size:8px;font-weight:700;padding:2px 6px;border-radius:4px;margin-top:5px;margin-right:3px;}
+.s-kb{background:rgba(255,159,10,.15);color:var(--orange);}
+.s-web{background:rgba(191,90,242,.15);color:var(--grape);}
+.typing-w{display:flex;align-items:flex-end;gap:7px;}
+.typing-bbl{background:var(--ink3);border:1px solid rgba(255,255,255,.06);border-radius:16px 16px 16px 4px;padding:12px 16px;display:flex;gap:5px;}
+.td{width:7px;height:7px;border-radius:50%;background:var(--text3);animation:tdot 1.2s infinite;}
+.td:nth-child(2){animation-delay:.2s;}.td:nth-child(3){animation-delay:.4s;}
+@keyframes tdot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+
+.qbar{padding:8px 16px 6px;overflow-x:auto;display:flex;gap:7px;flex-shrink:0;scrollbar-width:none;background:var(--ink2);border-top:1px solid rgba(255,255,255,.04);}
+.qbar::-webkit-scrollbar{display:none;}
+.qb{flex:0 0 auto;padding:7px 13px;border-radius:20px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .18s;border:1.5px solid;}
+.qb-r{background:rgba(255,59,92,.08);color:var(--yum);border-color:rgba(255,59,92,.2);}
+.qb-r:hover{background:rgba(255,59,92,.15);}
+.qb-p{background:rgba(191,90,242,.08);color:var(--grape);border-color:rgba(191,90,242,.2);}
+.qb-p:hover{background:rgba(191,90,242,.15);}
+.qb-g{background:rgba(0,245,160,.06);color:var(--drop);border-color:rgba(0,245,160,.15);}
+.qb-g:hover{background:rgba(0,245,160,.12);}
+
+.cin-area{padding:10px 16px;display:flex;gap:8px;align-items:flex-end;flex-shrink:0;background:var(--ink2);}
+.cinput{
+  flex:1;background:var(--glass);border:1.5px solid rgba(255,255,255,.08);
+  border-radius:20px;padding:10px 16px;font-size:13px;font-family:inherit;
+  font-weight:600;color:var(--text);resize:none;line-height:1.4;max-height:72px;
+}
+.cinput:focus{outline:none;border-color:var(--grape);}
+.cinput::placeholder{color:var(--text3);}
+.sbtn{
+  width:44px;height:44px;background:linear-gradient(135deg,var(--grape),var(--sky));
+  border:none;border-radius:14px;font-size:18px;color:white;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  box-shadow:0 3px 12px rgba(191,90,242,.35);transition:all .2s;
+}
+.sbtn:hover{transform:scale(1.08);}
+
+/* ═══════════════════════════════════════
+   ★ PROFILE SCREEN
+═══════════════════════════════════════ */
+.prof-hero{
+  margin:14px 16px;border-radius:var(--r);padding:22px;
+  background:linear-gradient(135deg,#1A0A2E,#2E0A1A,#0A1A2E);
+  border:1px solid rgba(191,90,242,.15);color:white;position:relative;overflow:hidden;
+}
+.ph-glow{position:absolute;top:-30px;right:-30px;width:140px;height:140px;border-radius:50%;background:var(--grape);opacity:.12;filter:blur(24px);}
+.ph-glow2{position:absolute;bottom:-20px;left:20px;width:80px;height:80px;border-radius:50%;background:var(--yum);opacity:.1;filter:blur(18px);}
+.p-av{width:60px;height:60px;background:linear-gradient(135deg,var(--yum),var(--grape));border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:11px;border:2px solid rgba(255,255,255,.2);}
+.p-name{font-family:'Clash Display',sans-serif;font-size:22px;font-weight:600;margin-bottom:1px;}
+.p-handle{font-size:11px;opacity:.6;margin-bottom:14px;font-weight:600;}
+.p-stats{display:flex;gap:18px;}
+.ps-n{font-family:'Clash Display',sans-serif;font-size:20px;font-weight:600;}
+.ps-l{font-size:9px;opacity:.6;font-weight:800;text-transform:uppercase;letter-spacing:.03em;}
+
+.mono-card{
+  margin:0 16px 14px;background:var(--ink3);border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--r);padding:15px;
+}
+.mc-t{font-family:'Clash Display',sans-serif;font-size:15px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.mc-s{font-size:11px;color:var(--text2);margin-bottom:12px;}
+.mono-track{height:6px;background:var(--glass);border-radius:3px;margin-bottom:5px;overflow:hidden;}
+.mono-fill{
+  height:100%;border-radius:3px;
+  background:linear-gradient(90deg,var(--grape),var(--yum),var(--orange));
+  background-size:200%;animation:shimmer 2.5s infinite linear;
+}
+@keyframes shimmer{0%{background-position:200%}100%{background-position:0%}}
+.mono-labs{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);font-weight:700;}
+.ml-n{color:var(--grape);font-weight:800;}
+
+.p-btns{padding:0 16px 14px;display:flex;gap:9px;}
+.pb2{flex:1;padding:12px;border-radius:var(--r);font-family:'Clash Display',sans-serif;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .2s;letter-spacing:.3px;}
+.pb2-p{background:linear-gradient(135deg,var(--grape),var(--sky));color:white;box-shadow:0 4px 14px rgba(191,90,242,.4);}
+.pb2-p:hover{transform:translateY(-1px);}
+.pb2-s{background:var(--glass);color:var(--text2);border:1px solid rgba(255,255,255,.1);}
+.pb2-s:hover{border-color:var(--grape);color:white;}
+
+/* VIDEO GRID in profile */
+.video-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:0 0 8px;}
+.vg-item{
+  aspect-ratio:9/16;position:relative;overflow:hidden;cursor:pointer;
+}
+.vg-bg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px;}
+.vg-overlay{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.7));padding:6px 6px 8px;}
+.vg-likes{font-size:9px;font-weight:800;color:white;display:flex;align-items:center;gap:2px;}
+.vg-dur{position:absolute;top:5px;right:5px;font-family:'DM Mono',monospace;font-size:8px;color:rgba(255,255,255,.8);background:rgba(0,0,0,.5);padding:2px 4px;border-radius:4px;}
+
+/* ═══════════════════════════════════════
+   SHARED: Section headers, scroll rows
+═══════════════════════════════════════ */
+.sec{display:flex;align-items:center;justify-content:space-between;padding:0 16px;margin-bottom:8px;}
+.sec-t{font-family:'Clash Display',sans-serif;font-size:16px;font-weight:600;color:var(--text);}
+.sec-a{font-size:11px;font-weight:700;color:var(--yum);cursor:pointer;}
+.hrow{overflow-x:auto;padding:4px 16px 8px;display:flex;gap:11px;margin-bottom:16px;scrollbar-width:none;}
+.hrow::-webkit-scrollbar{display:none;}
+.rcard{flex:0 0 170px;background:var(--ink3);border-radius:var(--r);border:1px solid rgba(255,255,255,.06);overflow:hidden;cursor:pointer;transition:all .25s;}
+.rcard:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,.4);}
+.rc-top{height:110px;display:flex;align-items:center;justify-content:center;font-size:50px;position:relative;}
+.rc-badge{position:absolute;top:7px;left:7px;font-size:8px;font-weight:700;padding:3px 7px;border-radius:7px;color:white;}
+.b-trend{background:var(--yum);}
+.b-ai{background:var(--grape);}
+.b-new{background:var(--drop2);}
+.rc-body{padding:10px 12px;}
+.rc-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;line-height:1.3;}
+.rc-meta{font-size:10px;color:var(--text3);margin-bottom:7px;}
+.rc-foot{display:flex;align-items:center;justify-content:space-between;}
+.rc-likes{font-size:10px;font-weight:700;color:var(--yum);}
+.rc-time{font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;background:rgba(255,159,10,.12);color:var(--orange);}
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+.toast{
+  position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(14px);
+  padding:10px 20px;border-radius:40px;font-size:12px;font-weight:700;
+  opacity:0;transition:all .3s;pointer-events:none;z-index:999;white-space:nowrap;
+  background:linear-gradient(135deg,var(--ink3),#252530);
+  color:white;border:1px solid rgba(255,255,255,.1);
+  box-shadow:0 6px 24px rgba(0,0,0,.5);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* Sheet */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .3s;}
+.overlay.show{opacity:1;pointer-events:all;}
+.bsheet{
+  background:var(--ink2);border-radius:26px 26px 0 0;
+  width:100%;max-width:420px;margin:0 auto;padding:20px;
+  transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);
+  max-height:65vh;overflow-y:auto;border-top:1px solid rgba(255,255,255,.08);
+}
+.overlay.show .bsheet{transform:translateY(0);}
+.sh{width:40px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;margin:0 auto 16px;}
+.bs-t{font-family:'Clash Display',sans-serif;font-size:20px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.bs-s{font-size:12px;color:var(--text2);margin-bottom:14px;}
+</style>
+</head>
+<body>
+
+<div class="device">
+
+  <!-- STATUS + TOPBAR -->
+  <div class="status">
+    <span class="s-time">9:41</span>
+    <div class="s-right"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+  </div>
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span class="logo">YumDrop</span>
+      <span style="font-size:9px;color:var(--text3);background:var(--glass);border:1px solid rgba(255,255,255,.06);padding:2px 7px;border-radius:10px;letter-spacing:.04em;">AI Kitchen</span>
+    </div>
+    <div class="topbar-right">
+      <div class="tb-icon" onclick="ding('🔍 Search coming soon!')">🔍</div>
+      <div class="tb-icon" onclick="ding('🔔 3 new followers!')">🔔</div>
+      <button class="live-btn" onclick="go('camera')">● LIVE</button>
+    </div>
+  </div>
+
+  <!-- SCREENS WRAPPER -->
+  <div style="flex:1;overflow:hidden;position:relative;display:flex;flex-direction:column;">
+
+  <!-- ═══ HOME / REELS ═══════════════════════════════════ -->
+  <div class="screen active" id="sc-home" style="padding-bottom:78px;">
+
+    <!-- Stories row -->
+    <div class="story-scroll" id="storiesRow"></div>
+
+    <!-- Feed Tabs -->
+    <div class="feed-tabs">
+      <div class="ftab active" onclick="filterFeed('all',this)">For You 🔥</div>
+      <div class="ftab" onclick="filterFeed('campus',this)">Campus 🎓</div>
+      <div class="ftab" onclick="filterFeed('cultural',this)">Stories 🌏</div>
+      <div class="ftab" onclick="filterFeed('quick',this)">Quick ⚡</div>
+    </div>
+
+    <!-- Reel cards -->
+    <div id="reelFeed" style="margin-top:4px;"></div>
+
+  </div>
+
+  <!-- ═══ CAMERA / RECORD ════════════════════════════════ -->
+  <div class="screen" id="sc-camera" style="padding-bottom:0;height:100%;">
+    <div class="cam-viewfinder" id="camViewfinder">
+      <div class="cam-grain"></div>
+      <div class="cam-grid"></div>
+      <div class="cam-content">
+        <div class="cam-scene-emoji" id="camEmoji">🍳</div>
+        <div class="cam-hint">Aim at your dish and tap record 🎬</div>
+      </div>
+      <!-- Recording indicator -->
+      <div class="rec-indicator" id="recIndicator">
+        <div class="rec-dot"></div>
+        <span class="rec-time" id="recTime">0:00</span>
+      </div>
+      <!-- Top controls -->
+      <div class="cam-top">
+        <div class="cam-ctrl" onclick="ding('🔊 Audio on!')">🔊</div>
+        <div class="cam-ctrl" onclick="ding('💡 Flash toggled!')">💡</div>
+        <div class="cam-ctrl" onclick="ding('✨ Filter applied!')">✨</div>
+        <div class="cam-ctrl" onclick="ding('😊 Face effects!')">😊</div>
+      </div>
+      <!-- Effects -->
+      <div class="cam-effects">
+        <div class="eff-btn" onclick="ding('🔥 Fire effect added!')">🔥</div>
+        <div class="eff-btn" onclick="ding('⏱ Timer set!')">⏱</div>
+        <div class="eff-btn" onclick="ding('📐 Grid on!')">📐</div>
+      </div>
+      <!-- Recipe overlay -->
+      <div class="cam-recipe-strip">
+        <div class="crs-label">🍳 Cooking now</div>
+        <div class="crs-recipe" id="camRecipe">Spicy Garlic Egg Fried Rice</div>
+        <div class="crs-chips">
+          <div class="crs-chip">🥚 Eggs</div>
+          <div class="crs-chip">🍚 Rice</div>
+          <div class="crs-chip">🫙 Soy sauce</div>
+          <div class="crs-chip">🧄 Garlic</div>
+        </div>
+      </div>
+      <!-- Speed controls -->
+      <div class="cam-speeds">
+        <div class="speed-btn" onclick="setSpeed(this,'0.3x')">0.3x</div>
+        <div class="speed-btn" onclick="setSpeed(this,'0.5x')">0.5x</div>
+        <div class="speed-btn active" onclick="setSpeed(this,'1x')">1x</div>
+        <div class="speed-btn" onclick="setSpeed(this,'2x')">2x</div>
+        <div class="speed-btn" onclick="setSpeed(this,'3x')">3x</div>
+      </div>
+    </div>
+
+    <div style="flex-shrink:0;background:var(--ink);">
+      <!-- Modes -->
+      <div class="cam-modes">
+        <div class="cam-mode" onclick="setCamMode(this,'photo')">Photo</div>
+        <div class="cam-mode active" onclick="setCamMode(this,'video')">Video</div>
+        <div class="cam-mode" onclick="setCamMode(this,'reel')">Reel</div>
+        <div class="cam-mode" onclick="setCamMode(this,'live')">LIVE</div>
+        <div class="cam-mode" onclick="setCamMode(this,'duet')">Duet</div>
+        <div class="cam-mode" onclick="setCamMode(this,'collab')">Collab</div>
+      </div>
+      <!-- Controls -->
+      <div class="cam-controls">
+        <div class="upload-btn" onclick="ding('📂 Opening gallery...')">🖼</div>
+        <div class="record-btn" id="recordBtn" onclick="toggleRecord()"></div>
+        <div class="flip-btn" onclick="flipCamera()">🔄</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ AI MATCHER ═════════════════════════════════════ -->
+  <div class="screen" id="sc-matcher">
+    <div class="m-hero">
+      <div class="mh-title">✦ Pantry Magic</div>
+      <div class="mh-sub">Tell Yum AI what's in your kitchen</div>
+    </div>
+    <div class="ing-section">
+      <div class="is-label">Tap your ingredients 👇</div>
+      <div class="itags" id="itags">
+        <div class="itag sel" onclick="togI(this,'Eggs')">🥚 Eggs<span> ×</span></div>
+        <div class="itag sel" onclick="togI(this,'Rice')">🍚 Rice<span> ×</span></div>
+        <div class="itag sel" onclick="togI(this,'Soy sauce')">🫙 Soy sauce<span> ×</span></div>
+        <div class="itag sel" onclick="togI(this,'Garlic')">🧄 Garlic<span> ×</span></div>
+        <div class="itag" onclick="togI(this,'Onion')">🧅 Onion<span> +</span></div>
+        <div class="itag" onclick="togI(this,'Tomato')">🍅 Tomato<span> +</span></div>
+        <div class="itag" onclick="togI(this,'Butter')">🧈 Butter<span> +</span></div>
+        <div class="itag" onclick="togI(this,'Noodles')">🍜 Noodles<span> +</span></div>
+        <div class="itag" onclick="togI(this,'Chicken')">🍗 Chicken<span> +</span></div>
+        <div class="itag" onclick="togI(this,'Lemon')">🍋 Lemon<span> +</span></div>
+      </div>
+      <div class="irow">
+        <input class="iinput" id="ii" placeholder="Type an ingredient..." onkeydown="if(event.key==='Enter')addCI()">
+        <button class="add-btn" onclick="addCI()">+</button>
+      </div>
+    </div>
+    <button class="find-btn" id="findBtn" onclick="runMatch()">✦ Drop the Recipes!</button>
+    <div class="ai-load" id="aiLoad">
+      <div class="ai-orb">✦</div>
+      <div class="al-title" id="ltxt">Searching recipe knowledge base...</div>
+      <div class="al-sub">Yum AI is working its magic</div>
+    </div>
+    <div class="match-results" id="matchRes" style="display:none;">
+      <div class="mr-label"><span style="width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--drop),var(--drop2));display:inline-block;"></span>Perfect drops 🎯</div>
+      <div id="perf"></div>
+      <div class="mr-label" style="margin-top:4px;"><span style="width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--yum),var(--orange));display:inline-block;"></span>Close drops 🔥</div>
+      <div id="clos"></div>
+    </div>
+  </div>
+
+  <!-- ═══ COOK SCREEN ════════════════════════════════════ -->
+  <div class="screen" id="sc-cook">
+    <div class="cook-pick">
+      <div class="ck-title">🍳 Drop & Cook</div>
+      <div class="ck-sub">Pick your recipe and let's roll!</div>
+      <div class="rpicks" id="rpicks"></div>
+    </div>
+    <div id="cookContent" style="display:none;">
+      <div class="step-card">
+        <div class="step-hdr">
+          <div class="s-badge" id="sBadge" style="background:linear-gradient(135deg,var(--yum),var(--orange))">Drop 1</div>
+          <div class="s-prog" id="sProg">1 of 5</div>
+        </div>
+        <span class="s-em" id="sEm">🔥</span>
+        <div class="s-title" id="sTitle">Heat the pan</div>
+        <div class="s-desc" id="sDesc">Loading...</div>
+      </div>
+      <div class="timer-row">
+        <div class="tdcard"><div class="tl">⏱ TIMER</div><div class="tn" id="tNum">2:00</div></div>
+        <button class="timer-btn" id="tBtn" onclick="togT()"><div class="ti-icon" id="tIcon">▶</div><div class="ti-lbl" id="tLbl">START</div></button>
+      </div>
+      <div class="ai-tip">
+        <div class="tip-sp">🤖</div>
+        <div><div class="tip-lbl">Yum AI Tip</div><div class="tip-txt" id="tipTxt">...</div></div>
+      </div>
+      <div class="sdots" id="sdots"></div>
+      <div class="snav">
+        <button class="snav-btn snav-p" onclick="prevSt()">← Back</button>
+        <button class="snav-btn snav-n" id="nextBtn" onclick="nextSt()">Next Drop →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ AI CHAT ════════════════════════════════════════ -->
+  <div class="screen" id="sc-chat">
+    <div class="chat-hdr">
+      <div class="ai-av">🤖</div>
+      <div>
+        <div class="ai-nm">Yum AI</div>
+        <div class="ai-st"><div class="st-dot"></div>Live · RAG + Web search</div>
+      </div>
+    </div>
+    <div class="rag-row">
+      <div class="rb r-kb">📚 Recipe KB</div>
+      <div class="rb r-web">🌐 Web Search</div>
+      <div class="rb r-ctx">🍳 Context</div>
+    </div>
+    <div class="chat-msgs" id="chatMsgs"></div>
+    <div class="qbar">
+      <button class="qb qb-r" onclick="qs('What can I sub for soy sauce?')">🔄 Sub soy sauce?</button>
+      <button class="qb qb-p" onclick="qs('Why is my fried rice soggy?')">🍚 Soggy rice?</button>
+      <button class="qb qb-g" onclick="qs('How do I get wok hei at home?')">🔥 Wok hei tips?</button>
+      <button class="qb qb-r" onclick="qs('Best student meals under 15 min?')">⚡ Quick meals?</button>
+      <button class="qb qb-p" onclick="qs('Can I book a cook session with Mia Kim?')">📞 Book creator</button>
+    </div>
+    <div class="cin-area">
+      <textarea class="cinput" id="cinput" rows="1" placeholder="Ask Yum AI anything... 🍴" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();doSend()}"></textarea>
+      <button class="sbtn" onclick="doSend()">↑</button>
+    </div>
+  </div>
+
+  <!-- ═══ PROFILE ════════════════════════════════════════ -->
+  <div class="screen" id="sc-profile">
+    <div class="prof-hero">
+      <div class="ph-glow"></div><div class="ph-glow2"></div>
+      <div class="p-av">👩‍🍳</div>
+      <div class="p-name">Mia Kim</div>
+      <div class="p-handle">@mia.kitchen · Seoul → NYC 🌏</div>
+      <div class="p-stats">
+        <div><div class="ps-n">42</div><div class="ps-l">Drops</div></div>
+        <div><div class="ps-n">3.6k</div><div class="ps-l">Followers</div></div>
+        <div><div class="ps-n">18.4k</div><div class="ps-l">Likes</div></div>
+        <div><div class="ps-n">124k</div><div class="ps-l">Views</div></div>
+      </div>
+    </div>
+    <div class="mono-card">
+      <div class="mc-t">⭐ Creator Milestone</div>
+      <div class="mc-s">5,000 likes unlocks premium drops + paid cook sessions</div>
+      <div class="mono-track"><div class="mono-fill" style="width:72%"></div></div>
+      <div class="mono-labs"><span class="ml-n">3,600 / 5,000 likes</span><span>72% 🔥</span></div>
+    </div>
+    <div class="p-btns">
+      <button class="pb2 pb2-p" onclick="go('chat');setTimeout(()=>qs('I want to book a session with Mia Kim'),350)">📞 Book Session</button>
+      <button class="pb2 pb2-s" onclick="ding('💜 Following @mia.kitchen!')">Follow</button>
+    </div>
+
+    <!-- Video grid (like Instagram/TikTok profile grid) -->
+    <div class="sec"><div class="sec-t">Video Drops</div><div class="sec-a" onclick="ding('📹 All 42 videos')">All →</div></div>
+    <div class="video-grid" id="videoGrid"></div>
+  </div>
+
+  </div><!-- screens wrapper -->
+
+  <!-- BOTTOM NAV -->
+  <div class="bnav">
+    <button class="nb active" id="nb-home" onclick="go('home')">
+      <div class="nb-ic">🏠</div><div class="nb-lbl">Home</div>
+    </button>
+    <button class="nb" id="nb-matcher" onclick="go('matcher')">
+      <div class="nb-ic">✦</div><div class="nb-lbl">Match</div>
+    </button>
+    <button class="nb nb-cam" id="nb-camera" onclick="go('camera')">
+      <div class="nb-ic">🎬</div><div class="nb-lbl">Record</div>
+    </button>
+    <button class="nb" id="nb-chat" onclick="go('chat')">
+      <div class="nb-ic">🤖</div><div class="nb-lbl">Yum AI</div>
+    </button>
+    <button class="nb" id="nb-profile" onclick="go('profile')">
+      <div class="nb-ic">👤</div><div class="nb-lbl">Profile</div>
+    </button>
+  </div>
+
+</div><!-- device -->
+
+<div class="toast" id="toastEl"></div>
+<div class="overlay" id="sheetOvl" onclick="maybeCls(event)"><div class="bsheet"><div class="sh"></div><div class="bs-t">🧺 Add Ingredient</div><div class="bs-s">What else is in your kitchen?</div><div class="irow" style="margin-bottom:12px;"><input class="iinput" id="sheetIn" placeholder="e.g. chicken, pasta..." onkeydown="if(event.key==='Enter')addFS()"><button class="add-btn" onclick="addFS()">+</button></div><div class="itags"><div class="itag" onclick="addIT('🍗 Chicken','Chicken')">🍗 Chicken</div><div class="itag" onclick="addIT('🍝 Pasta','Pasta')">🍝 Pasta</div><div class="itag" onclick="addIT('🧅 Onion','Onion')">🧅 Onion</div><div class="itag" onclick="addIT('🧀 Cheese','Cheese')">🧀 Cheese</div><div class="itag" onclick="addIT('🥔 Potato','Potato')">🥔 Potato</div></div></div></div>
+
+<script>
+/* ═══════════════════════════════════════
+   DATA
+═══════════════════════════════════════ */
+const RECIPES = [
+  { id:1, t:"Spicy Garlic Egg Fried Rice", e:"🍳", bg:"rv-1", time:"12 min", orig:"Korean-American", likes:4200, views:"82k", badge:"Trending 🔥", dur:"0:47", prog:62,
+    creator:"mia.kitchen", cav:"MK", ccolor:"#FF3B5C",
+    story:"My halmeoni (grandma) in Busan taught me this. No measurements — just feel and taste. I make it every exam week when I'm broke and stressed.",
+    tags:["#FriedRice","#Korean","#EggDrop","#StudentEats"],
+    ings:["eggs","rice","soy sauce","garlic","green onion","sesame oil"],
+    steps:[
+      {t:"Blast that wok",e:"🔥",d:"Wok or big skillet, highest heat. Add 2 tbsp oil, swirl to coat. Wait until a drop of water vanishes instantly. You want it SCREAMING hot.",s:120,tip:"A properly hot wok is the single biggest secret. Don't skip the preheat — it's the difference between fried and steamed rice."},
+      {t:"Scramble the eggs",e:"🥚",d:"Crack 2 eggs directly in. Scramble fast until 80% set — still a little soft. Push to the side. Don't fully cook them yet.",s:60,tip:"Slightly underdone eggs here is intentional — they finish cooking with the rice and stay fluffy, not rubbery."},
+      {t:"Drop in the rice",e:"🍚",d:"Add 1 cup cold cooked rice. Smash every clump with your spatula. Toss and fry hard for 2 minutes non-stop.",s:120,tip:"Day-old cold rice is the move — lower moisture means it fries properly instead of steaming into a soggy pile."},
+      {t:"Season around the edge",e:"🫙",d:"Pour 2 tbsp soy sauce around the pan edges — not directly on rice. Let it sizzle, then toss everything together fast.",s:30,tip:"Edge-soy-sauce is a pro trick — it scorches slightly and adds a deeper, smokier flavor you can't get by pouring on top."},
+      {t:"Finish & plate",e:"🍜",d:"Kill the heat. Drizzle sesame oil, scatter green onion, and serve immediately. Every second it sits, it loses magic.",s:0,tip:"Sesame oil is fragile — high heat destroys the aroma completely. Always add it off the flame right before you plate."}
+    ]},
+  { id:2, t:"Miso Butter Ramen Hack", e:"🍜", bg:"rv-4", time:"8 min", orig:"Japanese-inspired", likes:7800, views:"210k", badge:"Viral 🚀", dur:"0:34", prog:40,
+    creator:"tokyo.vibes", cav:"TV", ccolor:"#BF5AF2",
+    story:"Instant ramen shouldn't taste like sadness. Here's how I turned a $0.89 packet into something I'm actually proud of.",
+    tags:["#RamenHack","#DormFood","#Butter","#Miso"],
+    ings:["instant ramen","miso paste","butter","egg","green onion"], steps:[] },
+  { id:3, t:"Shakshuka for One", e:"🍳", bg:"rv-2", time:"15 min", orig:"Tunisian", likes:3400, views:"67k", badge:"Cultural 🌍", dur:"1:12", prog:55,
+    creator:"layla.cooks", cav:"LC", ccolor:"#FF9F0A",
+    story:"My family makes this every Friday morning in Tunis. Bread for scooping is mandatory. Don't you dare use a fork.",
+    tags:["#Shakshuka","#NorthAfrican","#Eggs","#Spicy"],
+    ings:["eggs","tomatoes","onion","bell pepper","cumin","feta"], steps:[] },
+  { id:4, t:"5-Ingredient Dal", e:"🥘", bg:"rv-3", time:"18 min", orig:"Indian", likes:2900, views:"54k", badge:"AI Pick ✦", dur:"1:28", prog:70,
+    creator:"spice.lab", cav:"SL", ccolor:"#FF3B5C",
+    story:"This is what I cook when homesick, broke, and missing my mom. Five ingredients, infinite comfort.",
+    tags:["#Dal","#Lentils","#Indian","#ComfortFood"],
+    ings:["red lentils","onion","tomato","garlic","cumin"], steps:[] },
+  { id:5, t:"Congee 4 Ways", e:"🍲", bg:"rv-1", time:"30 min", orig:"Cantonese", likes:6200, views:"148k", badge:"Trending 🔥", dur:"2:05", prog:30,
+    creator:"grandma.wu", cav:"GW", ccolor:"#00D4FF",
+    story:"Grandma Wu's congee that fixed every sick day, heartbreak, and exam failure I ever had. Now I'm sharing her secret.",
+    tags:["#Congee","#Cantonese","#Healing","#4Ways"],
+    ings:["rice","water","ginger","soy sauce","sesame oil"], steps:[] },
+  { id:6, t:"Nonna's Carbonara", e:"🍝", bg:"rv-5", time:"20 min", orig:"Italian — Rome", likes:5100, views:"132k", badge:"Story 📖", dur:"1:45", prog:85,
+    creator:"tomas.pasta", cav:"TP", ccolor:"#BF5AF2",
+    story:"Nonna Giulia made this every Sunday in Trastevere. She died last year. This video is for her. The egg must never scramble.",
+    tags:["#Carbonara","#Nonna","#Rome","#Pasta"],
+    ings:["pasta","eggs","pancetta","pecorino","black pepper"], steps:[] },
+];
+
+const STORIES_DATA = [
+  { e:"🍜", name:"mia.kitchen",  color:"#FF3B5C" },
+  { e:"🌮", name:"carlos.eats",  color:"#FF9F0A" },
+  { e:"🍛", name:"spice.lab",    color:"#BF5AF2" },
+  { e:"🥘", name:"layla.cooks",  color:"#00D4FF" },
+  { e:"🍝", name:"tomas.pasta",  color:"#00F5A0" },
+  { e:"🍲", name:"grandma.wu",   color:"#FFD60A" },
+  { e:"🥗", name:"fresh.bowl",   color:"#FF3B5C" },
+  { e:"🧆", name:"beirut.bites", color:"#BF5AF2" },
+];
+
+const KB = RECIPES.map(r=>`[KB] ${r.t}: ings=${r.ings.join(',')}, origin=${r.orig}, time=${r.time}`).join('\n');
+
+/* ═══════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════ */
+let cur = 'home';
+function go(name) {
+  const old = document.getElementById('sc-'+cur);
+  const nxt = document.getElementById('sc-'+name);
+  if (!nxt || name===cur) return;
+  old.classList.add('exit');
+  setTimeout(()=>old.classList.remove('active','exit'),300);
+  nxt.classList.add('active');
+  cur = name;
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  const b = document.getElementById('nb-'+name);
+  if(b) b.classList.add('active');
+  if(name==='chat') initChat();
+}
+
+/* ═══════════════════════════════════════
+   HOME — STORIES + REELS
+═══════════════════════════════════════ */
+function renderStories() {
+  document.getElementById('storiesRow').innerHTML = STORIES_DATA.map(s=>`
+    <div class="story-chip" onclick="ding('📖 ${s.name}\'s story!')">
+      <div class="story-ring"><div class="story-inner">${s.e}</div></div>
+      <div class="story-lbl">@${s.name}</div>
+    </div>`).join('');
+}
+
+let feedFilter = 'all';
+function filterFeed(f,btn) {
+  feedFilter=f;
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderReels();
+}
+
+const stepGrads = [
+  'linear-gradient(135deg,#FF3B5C,#FF9F0A)',
+  'linear-gradient(135deg,#BF5AF2,#0A84FF)',
+  'linear-gradient(135deg,#00F5A0,#00D4FF)',
+  'linear-gradient(135deg,#FFD60A,#FF9F0A)',
+  'linear-gradient(135deg,#FF3B5C,#BF5AF2)',
+];
+
+function renderReels() {
+  const data = feedFilter==='all' ? RECIPES :
+    feedFilter==='campus' ? RECIPES.filter(r=>r.likes>5000) :
+    feedFilter==='cultural' ? RECIPES.filter(r=>r.orig!=='Japanese-inspired'&&r.orig!=='Korean-American') :
+    RECIPES.filter(r=>parseInt(r.time)<15);
+  document.getElementById('reelFeed').innerHTML = data.map((r,i)=>reelHTML(r,i)).join('');
+}
+
+function reelHTML(r, i) {
+  const bc = {'Trending 🔥':'#FF3B5C','Viral 🚀':'#0A84FF','Cultural 🌍':'#FF9F0A','AI Pick ✦':'#BF5AF2','Story 📖':'#00D4FF'}[r.badge]||'#FF3B5C';
+  return `
+  <div class="reel-card">
+    <div class="reel-video ${r.bg}" onclick="openRecipe(${r.id})">
+      <div class="reel-emoji">${r.e}</div>
+      <div class="play-ring">▶</div>
+      <div class="duration">${r.dur}</div>
+      <div class="reel-progress"><div class="reel-progress-fill" style="width:${r.prog}%"></div></div>
+      <!-- Creator -->
+      <div class="reel-creator">
+        <div class="rc-top">
+          <div class="rc-avatar" style="background:${r.ccolor}20;color:${r.ccolor};">${r.cav[0]}</div>
+          <div class="rc-info">
+            <div class="rc-name">@${r.creator}<span class="follow-pill">Follow</span></div>
+            <div class="rc-origin">${r.orig}</div>
+          </div>
+        </div>
+        <div class="reel-title">${r.t}</div>
+        <div class="reel-tags">${r.tags.map(t=>`<div class="rtag">${t}</div>`).join('')}<div class="rtag ai">✦ AI matched</div></div>
+        <div class="story-snippet">"${r.story.substring(0,80)}..."</div>
+      </div>
+      <!-- Audio -->
+      <div class="reel-audio">
+        <div class="audio-disc">🎵</div>
+        <span>Original audio · @${r.creator}</span>
+      </div>
+      <!-- Side actions -->
+      <div class="reel-actions">
+        <div class="ra" onclick="event.stopPropagation();likeReel(this,${r.likes})">
+          <div class="ra-ic" id="like-ic-${r.id}">❤️</div>
+          <div class="ra-lbl" id="like-lbl-${r.id}">${(r.likes/1000).toFixed(1)}k</div>
+        </div>
+        <div class="ra" onclick="event.stopPropagation();ding('💬 Opening comments...')">
+          <div class="ra-ic">💬</div>
+          <div class="ra-lbl">${Math.round(r.likes/42)}</div>
+        </div>
+        <div class="ra" onclick="event.stopPropagation();ding('↗ Share link copied!')">
+          <div class="ra-ic">↗</div>
+          <div class="ra-lbl">Share</div>
+        </div>
+        <div class="ra" onclick="event.stopPropagation();ding('🔖 Saved!')">
+          <div class="ra-ic">🔖</div>
+          <div class="ra-lbl">Save</div>
+        </div>
+        <div class="ra" onclick="event.stopPropagation();ding('🎬 Duet started!')">
+          <div class="ra-ic">🎬</div>
+          <div class="ra-lbl">Duet</div>
+        </div>
+      </div>
+    </div>
+    <!-- Below video info -->
+    <div class="reel-info">
+      <div class="ri-row">
+        <div class="ri-stat">👁 <span>${r.views}</span></div>
+        <div class="ri-stat">❤️ <span>${(r.likes/1000).toFixed(1)}k</span></div>
+        <div class="ri-stat">🕐 <span>${r.time}</span></div>
+        <div class="cook-now-btn" onclick="openRecipe(${r.id})">🍳 Cook Now →</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <div style="background:rgba(255,59,92,.12);border:1px solid rgba(255,59,92,.2);color:var(--yum);font-size:9px;font-weight:700;padding:3px 9px;border-radius:10px;">${r.badge}</div>
+        ${r.ings.slice(0,3).map(g=>`<div style="background:var(--glass);color:var(--text2);font-size:9px;font-weight:600;padding:3px 8px;border-radius:10px;">${g}</div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function likeReel(el, baseCount) {
+  const icon = el.querySelector('.ra-ic');
+  const lbl = el.querySelector('.ra-lbl');
+  if(icon.classList.contains('liked')){
+    icon.classList.remove('liked'); icon.textContent='❤️';
+    lbl.textContent=(baseCount/1000).toFixed(1)+'k';
+  } else {
+    icon.classList.add('liked'); icon.textContent='❤️';
+    lbl.textContent=((baseCount+1)/1000).toFixed(1)+'k';
+    ding('❤️ Liked!');
+  }
+}
+
+function openRecipe(id) {
+  const r = RECIPES.find(x=>x.id===id);
+  if (!r) return;
+  if (r.steps.length>0) { selR=r; curSt=0; go('cook'); renderCook(); }
+  else { go('chat'); setTimeout(()=>qs(`Tell me about ${r.t} from ${r.orig}`),350); }
+}
+
+/* ═══════════════════════════════════════
+   PROFILE VIDEO GRID
+═══════════════════════════════════════ */
+function renderVideoGrid() {
+  const bgs = ['rv-1','rv-2','rv-3','rv-4','rv-5','rv-1','rv-3','rv-5','rv-2'];
+  const emojis = ['🍳','🍜','🥘','🍝','🍲','🫙','🥗','🍛','🧆'];
+  const likes = ['4.2k','7.8k','3.4k','5.1k','6.2k','1.9k','2.7k','3.3k','1.5k'];
+  const durs = ['0:47','0:34','1:12','1:45','2:05','0:28','1:30','0:55','1:18'];
+  document.getElementById('videoGrid').innerHTML = Array.from({length:9},(_,i)=>`
+    <div class="vg-item" onclick="ding('▶ Playing video ${i+1}...')">
+      <div class="vg-bg ${bgs[i]}">${emojis[i]}</div>
+      <div class="vg-dur">${durs[i]}</div>
+      <div class="vg-overlay"><div class="vg-likes">▶ ${likes[i]}</div></div>
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════════
+   CAMERA
+═══════════════════════════════════════ */
+let isRecording=false, recSecs=0, recInterval=null;
+const camEmojis=['🍳','🍜','🥘','🍝','🥗','🌮','🍛','🧆'];
+let camEmojiIdx=0;
+
+function toggleRecord() {
+  const btn=document.getElementById('recordBtn');
+  const ind=document.getElementById('recIndicator');
+  if (!isRecording) {
+    isRecording=true; recSecs=0;
+    btn.classList.add('recording');
+    ind.classList.add('active');
+    recInterval=setInterval(()=>{
+      recSecs++;
+      const m=Math.floor(recSecs/60), s=recSecs%60;
+      document.getElementById('recTime').textContent=`${m}:${s.toString().padStart(2,'0')}`;
+      // cycle scene emoji
+      if(recSecs%4===0){
+        camEmojiIdx=(camEmojiIdx+1)%camEmojis.length;
+        document.getElementById('camEmoji').textContent=camEmojis[camEmojiIdx];
+      }
+      if(recSecs>=60){stopRec();}
+    },1000);
+    ding('🔴 Recording started!');
+  } else { stopRec(); }
+}
+function stopRec() {
+  if(!isRecording) return;
+  isRecording=false;
+  clearInterval(recInterval);
+  document.getElementById('recordBtn').classList.remove('recording');
+  document.getElementById('recIndicator').classList.remove('active');
+  if(recSecs>0){
+    ding(`✅ Video saved! (${recSecs}s) — Upload to your Drop?`);
+    setTimeout(()=>go('home'),1800);
+  }
+}
+function flipCamera() {
+  const vf=document.getElementById('camViewfinder');
+  vf.style.transform='scaleX(-1)';
+  setTimeout(()=>vf.style.transform='',400);
+  ding('📷 Camera flipped!');
+}
+function setSpeed(el,spd) {
+  document.querySelectorAll('.speed-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  ding(`⚡ Speed: ${spd}`);
+}
+function setCamMode(el,mode) {
+  document.querySelectorAll('.cam-mode').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  if(mode==='live') ding('📡 Going LIVE in 3...');
+  else if(mode==='duet') ding('🎬 Duet mode — pick a video to duet with!');
+  else ding(`🎬 Mode: ${mode}`);
+}
+
+/* ═══════════════════════════════════════
+   AI MATCHER
+═══════════════════════════════════════ */
+let selI=['Eggs','Rice','Soy sauce','Garlic'];
+function togI(el,name) {
+  const i=selI.indexOf(name);
+  if(i>-1){selI.splice(i,1);el.classList.remove('sel');el.querySelector('span').textContent=' +';}
+  else{selI.push(name);el.classList.add('sel');el.querySelector('span').textContent=' ×';}
+}
+function addCI() {
+  const inp=document.getElementById('ii'); const v=inp.value.trim(); if(!v)return;
+  if(!selI.includes(v))selI.push(v);
+  const el=document.createElement('div'); el.className='itag sel';
+  el.innerHTML=`${v}<span> ×</span>`; el.onclick=()=>togI(el,v);
+  document.getElementById('itags').appendChild(el);
+  inp.value=''; inp.focus();
+}
+const loadMsgs=['Rummaging your kitchen stash... 🧺','Querying the recipe knowledge base... 📚','Firing up web search... 🌐','Almost dropping the results! ✦'];
+let alStep=0,alT=null;
+function startAl(){
+  alStep=0; alT=setInterval(()=>{
+    alStep=Math.min(alStep+1,3);
+    document.getElementById('ltxt').textContent=loadMsgs[alStep];
+  },900);
+}
+function stopAl(){clearInterval(alT);}
+
+async function runMatch() {
+  if(!selI.length){ding('🧺 Add at least one ingredient!');return;}
+  const btn=document.getElementById('findBtn');
+  const ld=document.getElementById('aiLoad'); const mr=document.getElementById('matchRes');
+  btn.disabled=true; btn.textContent='⏳ Dropping...';
+  ld.classList.add('show'); mr.style.display='none'; startAl();
+  const sys=`You are YumDrop's AI Recipe Matcher. Use this knowledge base:\n${KB}\n\nReturn ONLY a JSON array (no markdown). Each: {"title":str,"emoji":str,"matchPct":num,"matchType":"perfect"|"close"|"stretch","missingIngredients":str[],"aiSwap":str,"origin":str,"time":str,"reason":str}. Return 4-6 matches sorted by matchPct. Include 1 creative web-inspired recipe.`;
+  try {
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:900,system:sys,messages:[{role:'user',content:`My ingredients: ${selI.join(', ')}`}],tools:[{type:'web_search_20250305',name:'web_search'}]})});
+    const d=await res.json();
+    let txt=d.content.filter(b=>b.type==='text').map(b=>b.text).join('').replace(/```json|```/g,'').trim();
+    const m=JSON.parse(txt); stopAl(); ld.classList.remove('show'); btn.disabled=false; btn.textContent='✦ Drop the Recipes!'; renderMatches(m);
+  } catch {
+    stopAl(); ld.classList.remove('show'); btn.disabled=false; btn.textContent='✦ Drop the Recipes!'; renderMatches(localMatch());
+  }
+}
+function localMatch() {
+  const lw=selI.map(i=>i.toLowerCase());
+  return RECIPES.map(r=>{const m=r.ings.filter(i=>lw.some(u=>i.includes(u)||u.includes(i)));const p=Math.round(m.length/r.ings.length*100);const ms=r.ings.filter(i=>!lw.some(u=>i.includes(u)||u.includes(i)));return{title:r.t,emoji:r.e,matchPct:p,matchType:p>=85?'perfect':p>=55?'close':'stretch',missingIngredients:ms,aiSwap:ms[0]?`Try a pantry sub for ${ms[0]}`:'',origin:r.orig,time:r.time,reason:`${m.length}/${r.ings.length} ingredients matched`};}).sort((a,b)=>b.matchPct-a.matchPct);
+}
+function renderMatches(ms) {
+  const mr=document.getElementById('matchRes'); mr.style.display='block';
+  const perf=ms.filter(m=>m.matchType==='perfect');
+  const clos=ms.filter(m=>m.matchType!=='perfect');
+  document.getElementById('perf').innerHTML=(perf.length?perf:ms.slice(0,2)).map(mcH).join('');
+  document.getElementById('clos').innerHTML=clos.map(mcH).join('');
+  mr.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function mcH(m) {
+  const c=m.matchType==='perfect'?'linear-gradient(135deg,#00F5A0,#00D4FF)':'linear-gradient(135deg,#FF3B5C,#FF9F0A)';
+  const pc=m.matchType==='perfect'?'#00F5A0':'#FF3B5C';
+  return `<div class="mcard ${m.matchType}" onclick="ding('Opening ${m.title}...')"><div class="mc-em">${m.emoji}</div><div class="mc-info"><div class="mc-title">${m.title}</div><div class="mc-sub">${m.reason} · ${m.time||''} · ${m.origin||''}</div>${m.missingIngredients&&m.missingIngredients.length?`<div class="mc-swap">✦ AI Swap: ${m.aiSwap||'available'}</div>`:''}<div class="mc-bar"><div class="mc-bar-fill" style="width:${m.matchPct}%;background:${c}"></div></div></div><div class="mc-pct" style="color:${pc}">${m.matchPct}%</div></div>`;
+}
+
+/* ═══════════════════════════════════════
+   COOKING MODE
+═══════════════════════════════════════ */
+let selR=RECIPES[0],curSt=0,tSecs=120,tRun=false,tInt=null;
+function renderCook() {
+  document.getElementById('rpicks').innerHTML=RECIPES.filter(r=>r.steps.length>0).concat(RECIPES.filter(r=>!r.steps.length).slice(0,3)).map(r=>`<div class="rpick ${r.id===selR?.id?'sel':''}" onclick="selRec(${r.id})"><div class="rp-em">${r.e}</div><div class="rp-name">${r.t}</div><div class="rp-time">${r.time}</div></div>`).join('');
+  if(selR&&selR.steps.length){document.getElementById('cookContent').style.display='block';renderStep();}
+  else document.getElementById('cookContent').style.display='none';
+}
+function selRec(id){const r=RECIPES.find(x=>x.id===id);if(!r)return;if(!r.steps.length){ding('📹 Opening recipe video...');go('chat');setTimeout(()=>qs(`Walk me through making ${r.t}`),400);return;}selR=r;curSt=0;clearInterval(tInt);tRun=false;renderCook();}
+function renderStep(){
+  const s=selR.steps; const st=s[curSt]; if(!st) return;
+  const grad=stepGrads[curSt%stepGrads.length];
+  document.getElementById('sBadge').textContent=`Drop ${curSt+1}`;
+  document.getElementById('sBadge').style.background=grad;
+  document.getElementById('sProg').textContent=`${curSt+1} of ${s.length}`;
+  document.getElementById('sEm').textContent=st.e;
+  document.getElementById('sTitle').textContent=st.t;
+  document.getElementById('sDesc').textContent=st.d;
+  document.getElementById('tipTxt').textContent=st.tip;
+  document.getElementById('nextBtn').textContent=curSt===s.length-1?'🎉 That\'s a Yum!':'Next Drop →';
+  tSecs=st.s||60; resetT();
+  document.getElementById('sdots').innerHTML=s.map((_,i)=>`<div class="sdot ${i===curSt?'a':''}" onclick="jmpSt(${i})"></div>`).join('');
+}
+function jmpSt(i){clearInterval(tInt);tRun=false;curSt=i;renderStep();}
+function prevSt(){if(curSt>0){clearInterval(tInt);tRun=false;curSt--;renderStep();}else ding('🏁 Already on the first step!');}
+function nextSt(){if(curSt<selR.steps.length-1){clearInterval(tInt);tRun=false;curSt++;renderStep();}else{ding('🎉 You nailed it! Time to eat!');setTimeout(()=>go('home'),1200);}}
+function togT(){
+  if(tRun){clearInterval(tInt);tRun=false;document.getElementById('tIcon').textContent='▶';document.getElementById('tLbl').textContent='START';}
+  else{tRun=true;document.getElementById('tIcon').textContent='⏸';document.getElementById('tLbl').textContent='PAUSE';
+    tInt=setInterval(()=>{if(tSecs>0){tSecs--;updT();}else{clearInterval(tInt);tRun=false;document.getElementById('tNum').classList.add('done');document.getElementById('tIcon').textContent='✓';document.getElementById('tLbl').textContent='DONE!';ding("⏱ Time's up! Next drop! 🔥");}},1000);}
+}
+function resetT(){clearInterval(tInt);tRun=false;tSecs=selR.steps[curSt]?.s||60;document.getElementById('tNum').classList.remove('done');document.getElementById('tIcon').textContent='▶';document.getElementById('tLbl').textContent='START';updT();}
+function updT(){const m=Math.floor(tSecs/60),s=tSecs%60;document.getElementById('tNum').textContent=`${m}:${s.toString().padStart(2,'0')}`;}
+
+/* ═══════════════════════════════════════
+   AI CHAT
+═══════════════════════════════════════ */
+const chatH=[]; let chatReady=false;
+function initChat(){
+  if(chatReady)return; chatReady=true;
+  addBub('ai',"Hey! 👋 I'm Yum AI — your personal cooking genius! I've got the full recipe knowledge base loaded AND I can search the web. What do you need help with? 🍴");
+}
+function addBub(role,txt,srcs){
+  const c=document.getElementById('chatMsgs');
+  const w=document.createElement('div'); w.className=`mw ${role==='user'?'u':''}`;
+  const sh=srcs?srcs.map(s=>`<span class="src-t ${s.t==='kb'?'s-kb':'s-web'}">${s.l}</span>`).join(''):'';
+  w.innerHTML=`<div class="bav ${role==='user'?'u':'ai'}">${role==='user'?'You':'🤖'}</div><div class="bbl ${role==='user'?'u':'ai'}">${txt}${sh?`<div style="margin-top:5px;">${sh}</div>`:''}</div>`;
+  c.appendChild(w); c.scrollTop=c.scrollHeight;
+}
+function showTyp(){const c=document.getElementById('chatMsgs');const el=document.createElement('div');el.className='typing-w';el.id='typEl';el.innerHTML=`<div class="bav ai">🤖</div><div class="typing-bbl"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;c.appendChild(el);c.scrollTop=c.scrollHeight;}
+function hideTyp(){document.getElementById('typEl')?.remove();}
+function qs(t){document.getElementById('cinput').value=t;doSend();}
+async function doSend(){
+  const inp=document.getElementById('cinput'); const txt=inp.value.trim(); if(!txt)return;
+  inp.value=''; addBub('user',txt); chatH.push({role:'user',content:txt}); showTyp();
+  const sys=`You are Yum AI on YumDrop — a fun, energetic, knowledgeable cooking assistant for students and beginner cooks.\n\nRECIPE KB:\n${KB}\n\nContext: User may be cooking "${selR?.t}" step ${curSt+1}. The app also has a video recording feature where users can share cooking videos (Reels), duet with other creators, and go LIVE.\n\nPersonality: Enthusiastic, warm, practical. Keep replies 2-3 sentences. Use food emojis occasionally. If someone asks to book a creator call or session, confirm you can set up a paid 30-min cooking session. If asked about recording/video features, explain users can tap the 🎬 Record button to film their cooking and share as a Reel.\n\nEnd with: SOURCES: [KB / Web / both]`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:500,system:sys,messages:chatH,tools:[{type:'web_search_20250305',name:'web_search'}]})});
+    const d=await res.json(); let full=d.content.filter(b=>b.type==='text').map(b=>b.text).join('');let usedWeb=d.content.some(b=>(b.type==='tool_use'||b.type==='mcp_tool_use')&&b.name==='web_search');let reply=full,srcs=[];const sm=full.match(/SOURCES?:(.*)/i);if(sm){reply=full.replace(/SOURCES?:.*/is,'').trim();const s=sm[1].toLowerCase();if(s.includes('kb'))srcs.push({t:'kb',l:'📚 Recipe KB'});if(s.includes('web')||usedWeb)srcs.push({t:'web',l:'🌐 Web'});}else srcs.push({t:'kb',l:'📚 Recipe KB'});
+    chatH.push({role:'assistant',content:reply}); hideTyp(); addBub('ai',reply,srcs);
+  }catch{hideTyp();const fb="Oops, brain freeze! 🧊 Quick tip: for fried rice use COLD day-old rice and a SCREAMING hot wok 🔥";chatH.push({role:'assistant',content:fb});addBub('ai',fb,[{t:'kb',l:'📚 Recipe KB'}]);}
+}
+
+/* ═══════════════════════════════════════
+   PANTRY SHEET
+═══════════════════════════════════════ */
+let pantryI=['Eggs','Rice','Soy sauce'];
+function openSheet(){document.getElementById('sheetOvl').classList.add('show');}
+function maybeCls(e){if(e.target===document.getElementById('sheetOvl'))document.getElementById('sheetOvl').classList.remove('show');}
+function addFS(){const v=document.getElementById('sheetIn').value.trim();if(v)addIT(v,v);document.getElementById('sheetIn').value='';}
+function addIT(label,name){if(!pantryI.includes(name)){pantryI.push(name);ding(`✅ ${name} stashed!`);}document.getElementById('sheetOvl').classList.remove('show');}
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+let tT;
+function ding(msg){const el=document.getElementById('toastEl');el.textContent=msg;el.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>el.classList.remove('show'),2600);}
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+renderStories();
+renderReels();
+renderCook();
+renderVideoGrid();
+</script>
+</body>
+</html>
